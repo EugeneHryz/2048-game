@@ -7,37 +7,39 @@ import javafx.scene.paint.Color;
 
 public class Tile {
 
-	private static int size = Game2048.tileSize;
-	private static int arcSize = Game2048.arcSize;
-	Rectangle tile;
-	private Color color = Color.THISTLE;
+	private static int size = Game2048.tileSize - Game2048.tilesSpacing;
+	private static int arcSize = Game2048.tileArcSize;
+	private Rectangle tile;
+	private Color color = Color.PEACHPUFF;
 	private int number = 2;
 	private Text text;
-	private StackPane stackPane;
+	StackPane pane;
 
 	Tile() {
 
 		tile = new Rectangle(size, size);
 		tile.setArcHeight(arcSize);
 		tile.setArcWidth(arcSize);
-		
 		tile.setFill(color);
+
 		text = new Text(Integer.toString(number));
-		
-		stackPane = new StackPane();
-		stackPane.getChildren().addAll(tile, text);
+		text.setFill(Color.ALICEBLUE);
+		text.setId("tile-text1");
+
+		pane = new StackPane();
+		pane.getChildren().addAll(tile, text);
 	}
 
-	public void createNextTile() {
+	public void getNextTile() {
 
 		number *= 2;
-		
-		text = new Text(Integer.toString(number));
+
+		text.setText(Integer.toString(number));
 
 		switch (number) {
 
 		case 4:
-			color = Color.PEACHPUFF;
+			color = Color.THISTLE;
 			break;
 		case 8:
 			color = Color.PINK;
@@ -49,37 +51,35 @@ public class Tile {
 			color = Color.PALEVIOLETRED;
 			break;
 		case 64:
-			color = Color.PURPLE;
+			color = Color.MEDIUMVIOLETRED;
 			break;
 		case 128:
-			color = Color.LIGHTCORAL;
+			color = Color.MEDIUMTURQUOISE;
+			text.setId("tile-text2");
 			break;
 		case 256:
-			color = Color.INDIANRED;
+			color = Color.LIGHTSEAGREEN;
 			break;
 		case 512:
-			color = Color.CRIMSON;
+			color = Color.TEAL;
 			break;
 		case 1024:
-			color = Color.FIREBRICK;
+			color = Color.DARKCYAN;
+			text.setId("tile-text3");
 			break;
 		case 2048:
-			color = Color.RED;
+			color = Color.CYAN;
+			break;
 
 		}
-		
+
 		tile.setFill(color);
-		
+
 	}
-	
+
 	public int getNumber() {
-		
+
 		return number;
-	}
-	
-	public StackPane getStackPane() {
-		
-		return stackPane;
 	}
 
 }
