@@ -8,6 +8,17 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.Path;
+
+import javafx.animation.*;
+import javafx.util.Duration;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+
+import javafx.animation.PathTransition;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
@@ -55,18 +66,14 @@ public class Game2048 extends Application {
 		field.setFill(Color.ALICEBLUE);
 
 		Button newGameButton = new Button("New game");
-		newGameButton.setOnAction(new EventHandler<ActionEvent>() {
-			
-			public void handle(ActionEvent event) {}
-			
-		});
+		
 		newGameButton.setId("button1");
 
 		newGameButton.setLayoutX(buttonX);
 		newGameButton.setLayoutY(button1Y);
 
 		Button endGameButton = new Button("End");
-		endGameButton.setId("button2");				// was slateblue color
+		endGameButton.setId("button2");					// was slateblue color
 
 		endGameButton.setLayoutX(buttonX);
 		endGameButton.setLayoutY(button2Y);
@@ -104,13 +111,39 @@ public class Game2048 extends Application {
 		testTile3.pane.setLayoutX(grid[4][1].getX());
 		testTile3.pane.setLayoutY(grid[4][1].getY());
 		
-		testTile4.pane.setLayoutX(grid[4][3].getX());
+		testTile4.pane.setLayoutX(grid[4][3].getX());			// was at grid[4][3]
 		testTile4.pane.setLayoutY(grid[4][3].getY());
 		
 		testTile5.pane.setLayoutX(grid[1][0].getX());
 		testTile5.pane.setLayoutY(grid[1][0].getY());
+
+		newGameButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			public void handle(ActionEvent event) {
+
+				Path testPath = new Path();
+				testPath.getElements().add(new MoveTo(40, 40));
+				testPath.getElements().add(new LineTo(40, -280));
+
+				PathTransition testTr = new PathTransition();
+				testTr.setDuration(Duration.millis(1500));
+				testTr.setPath(testPath);
+				testTr.setNode(testTile4.pane);
+				testTr.setCycleCount(Timeline.INDEFINITE);
+				testTr.setAutoReverse(true);
+				testTr.play();
+			}
+		});
 		
-		myPane.getChildren().addAll(field, newGameButton, endGameButton, score, testTile1.pane, testTile2.pane, testTile3.pane, testTile4.pane, testTile5.pane);
+		endGameButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			public void handle(ActionEvent event) {
+			}
+
+		});
+
+		myPane.getChildren().addAll(field, newGameButton, endGameButton, score, testTile1.pane, testTile2.pane,
+				testTile3.pane, testTile4.pane, testTile5.pane);
 		myPane.setStyle("-fx-background-color: #6495ED");
 
 		Scene scene = new Scene(myPane, xScene, yScene);
