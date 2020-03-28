@@ -26,11 +26,15 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.geometry.Point2D;
 import java.lang.Object;
+
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.event.EventHandler;
 import java.awt.Point;
 
 public class Game2048 extends Application {
 
-	public static final int xScene = 700;
+	public static final int xScene = 720;
 	public static final int yScene = 500;
 	public static final int bOffset = 50;
 
@@ -43,7 +47,7 @@ public class Game2048 extends Application {
 	public static final int fieldSize = 5;
 
 	public static final int tilesSize = 80; 		// variables for 5x5 mode
-	public static final int tilesArcSize = 30;
+	public static final int tilesArcSize = 30;		// for 4x4 tilesSize 125, tilesSpacing 15
 	public static final int tilesSpacing = 5;
 
 	private Pane mainPane = new Pane();
@@ -76,7 +80,7 @@ public class Game2048 extends Application {
 
 		score.setLayoutX(scoreX);
 		score.setLayoutY(scoreY);
-
+		
 		newGameButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {
@@ -84,24 +88,49 @@ public class Game2048 extends Application {
 		});
 		endGameButton.setOnAction(new EventHandler<ActionEvent>() {
 
-			public void handle(ActionEvent event) {
-			}
+			public void handle(ActionEvent event) {}
 		});
 		
 		board = new GameBoard(bOffset, bOffset, fieldSize, tilesSize, tilesSpacing, tilesArcSize);
 		
-		board.createTile(0, 1);
-
+		board.createTileRandom();
+		board.createTileRandom();
+		board.setFocusTraversable(true);
+		
 		mainPane.getChildren().addAll(newGameButton, endGameButton, score, board);
 		mainPane.setStyle("-fx-background-color: #6495ED");
 
 		Scene scene = new Scene(mainPane, xScene, yScene);
+		
+		board.setOnKeyPressed(new EventHandler<KeyEvent> () {
 
+			public void handle(KeyEvent e) {
+				
+				switch (e.getCode()) {
+				
+				case A:
+					board.moveAllTiles(Direction.LEFT);
+					break;
+				case D:
+					board.moveAllTiles(Direction.RIGHT);
+					break;
+				case W:
+					board.moveAllTiles(Direction.UP);
+					break;
+				case S:
+					board.moveAllTiles(Direction.DOWN);
+					break;
+				}
+			}
+			
+			
+		});
+		
 		primaryStage.setScene(scene);
 
 		scene.getStylesheets().add("MyStyles.css");
 		primaryStage.show();
-
+		
+		board.requestFocus();
 	}
-
 }

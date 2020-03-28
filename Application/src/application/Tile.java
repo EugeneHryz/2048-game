@@ -5,8 +5,12 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 import javafx.animation.PathTransition;
+import javafx.animation.PauseTransition;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 
@@ -15,21 +19,24 @@ public class Tile extends StackPane {
 	private static int size = GameBoard.tilesSize - GameBoard.tilesSpacing;
 	private static int arcSize = GameBoard.tilesArcSize;
 
-	private int x;
-	private int y;
+	private int number = 2;
 	private Rectangle tile;
 	private Color color = Color.PEACHPUFF;
-	private int number = 2;
 	private Text text;
-
+	
+	private int x;
+	private int y;
+	
+	private int moveToX;
+	private int moveToY;
 	private Path path;
 	private PathTransition pathTr;
-	private static int moveDuration = 1500;
+	//private Translate translate;
+	private static int moveDuration = 1000;
+	
+	private boolean combined = false;
 
 	Tile(int x, int y) {
-
-		this.x = x;
-		this.y = y;
 
 		tile = new Rectangle(size, size);
 		tile.setArcHeight(arcSize);
@@ -43,6 +50,8 @@ public class Tile extends StackPane {
 		this.getChildren().addAll(tile, text);
 		this.setLayoutX(x);
 		this.setLayoutY(y);
+		this.x = x;
+		this.y = y;
 
 		path = new Path();
 
@@ -51,7 +60,14 @@ public class Tile extends StackPane {
 		pathTr.setDuration(Duration.millis(moveDuration));
 		pathTr.setCycleCount(1);
 		pathTr.setAutoReverse(false);
-
+		
+		//translate = new Translate();
+		pathTr.setOnFinished(new EventHandler<ActionEvent> () {
+			
+			public void handle(ActionEvent e) {
+				setLayout();
+			}
+		});
 	}
 
 	public void getNextTile() {
@@ -100,31 +116,58 @@ public class Tile extends StackPane {
 		tile.setFill(color);
 
 	}
+	public void setMoveToX(int x) {
+		
+		moveToX = x - this.x + size / 2;
+	}
+	
+	public void setMoveToY(int y) {
+		
+		moveToY = this.y - y + size / 2; 
+	}
 
 	public int getNumber() {
 
 		return number;
 	}
-
-	public void setX(int x) {
-
-		this.x = x;
+	public void setLayout() {
+		
+		this.setTranslateX(0);
+		this.setTranslateY(0);
+		this.relocate(x, y);
+		System.out.println("Translate:" + this.getTranslateX() + " " + this.getTranslateY() + 
+				" Layout:" + this.getLayoutX() + " " + this.getLayoutY());
 	}
-
-	public void setY(int y) {
-
-		this.y = y;
+	public void setCombined(boolean value) {
+		
+		combined = value;
 	}
+	public boolean getCombined() {
+		
+		return combined;
+	}
+	
+	public void moveTo() {
 
-	public void moveTile(int offsetX, int offsetY) {
+		/*
+		 * path.getElements().clear(); path.getElements().add(new MoveTo(size / 2, size
+		 * / 2)); path.getElements().add(new LineTo(moveToX, moveToY));
+		 * 
+		 * pathTr.setPath(path);
+		 */
+		
+		x += moveToX - size / 2;
+		y += -moveToY + size / 2;
+		
+		this.setLayoutX(x);
+		this.setLayoutY(y);
+		//pathTr.play();
+		/*
+		 * translate.setX(moveToX - size / 2); translate.setY(moveToY - size / 2);
+		 * 
+		 * this.getTransforms().add(translate);
+		 */
 
-		path.getElements().clear();
-		path.getElements().add(new MoveTo(size / 2, size / 2));
-		path.getElements().add(new LineTo(offsetX + size / 2, offsetY + size / 2));
-
-		pathTr.setPath(path);
-
-		pathTr.play();
 	}
 
 	

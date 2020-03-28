@@ -8,6 +8,7 @@ module Application {
 	requires javafx.swing;
 	requires javafx.swt;
 	requires javafx.web;
+	requires java.desktop;
 	
 	exports application;
 }
