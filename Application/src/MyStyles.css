@@ -1,3 +1,11 @@
+@font-face {
+	
+	src: url(Fonts/Nunito-Bold.ttf);
+}
+@font-face {
+	
+	src: url(Fonts/SourceCodePro-SemiBold.ttf);
+}
 #button1 {
 	
 	-fx-background-color: #F0F8FF,
@@ -11,7 +19,6 @@
     -fx-text-fill: #F0F8FF;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
 }
-
 #button1:hover {
 
 	-fx-background-color: #F0F8FF,
@@ -25,7 +32,6 @@
     -fx-text-fill: #F0F8FF;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
 }
-
 #button1:pressed {
 	
 	-fx-background-color: #F0F8FF,
@@ -39,7 +45,6 @@
     -fx-text-fill: #F0F8FF;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
 }
-
 #button2 {
 	
 	-fx-background-color: #F0F8FF,
@@ -47,13 +52,12 @@
         linear-gradient(#483D8B, #483D8B);
     -fx-background-insets: 0,9 9 8 9,3,10,11;
     -fx-background-radius: 50;
-    -fx-padding: 15 67 15 67;
+    -fx-padding: 15 20 15 20;
     -fx-font-family: "Helvetica";
-    -fx-font-size: 24px;
+    -fx-font-size: 23px;
     -fx-text-fill: #F0F8FF;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
 }
-
 #button2:hover {
 
 	-fx-background-color: #F0F8FF,
@@ -61,13 +65,12 @@
         linear-gradient(#4B0082, #4B0082);
     -fx-background-insets: 0,9 9 8 9,3,10,11;
     -fx-background-radius: 50;
-    -fx-padding: 15 67 15 67;
+    -fx-padding: 15 20 15 20;
     -fx-font-family: "Helvetica";
-    -fx-font-size: 24px;
+    -fx-font-size: 23px;
     -fx-text-fill: #F0F8FF;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
 }
-
 #button2:pressed {
 	
 	-fx-background-color: #F0F8FF,
@@ -75,30 +78,137 @@
         linear-gradient(#4B0082, #4B0082);
     -fx-background-insets: 0,9 9 8 9,3,10,11;
     -fx-background-radius: 50;
-    -fx-padding: 14 66 14 66;
+    -fx-padding: 14 19 14 19;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 23px;
+    -fx-text-fill: #F0F8FF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
+}
+#button3 {
+	
+	-fx-background-color: #F0F8FF,
+        rgba(0,0,0,0),
+        linear-gradient(#483D8B, #483D8B);
+    -fx-background-insets: 0,9 9 8 9,3,10,11;
+    -fx-background-radius: 50;
+    -fx-padding: 15 66 15 66;
     -fx-font-family: "Helvetica";
     -fx-font-size: 24px;
     -fx-text-fill: #F0F8FF;
     -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
 }
+#button3:hover {
 
+	-fx-background-color: #F0F8FF,
+        rgba(0,0,0,0),
+        linear-gradient(#191970, #191970);
+    -fx-background-insets: 0,9 9 8 9,3,10,11;
+    -fx-background-radius: 50;
+    -fx-padding: 15 66 15 66;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 24px;
+    -fx-text-fill: #F0F8FF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
+}
+#button3:pressed {
+	
+	-fx-background-color: #F0F8FF,
+        rgba(0,0,0,0),
+        linear-gradient(#4B0082, #4B0082);
+    -fx-background-insets: 0,9 9 8 9,3,10,11;
+    -fx-background-radius: 50;
+    -fx-padding: 14 65 14 65;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 24px;
+    -fx-text-fill: #F0F8FF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
+}
+#button4 {
+	
+	-fx-background-color: #F0F8FF,
+        rgba(0,0,0,0),
+        linear-gradient(#483D8B, #483D8B);
+    -fx-background-insets: 0,9 9 8 9,3,10,11;
+    -fx-background-radius: 50;
+    -fx-padding: 15 50 15 50;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 24px;
+    -fx-text-fill: #F0F8FF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
+}
+#button4:hover {
+
+	-fx-background-color: #F0F8FF,
+        rgba(0,0,0,0),
+        linear-gradient(#191970, #191970);
+    -fx-background-insets: 0,9 9 8 9,3,10,11;
+    -fx-background-radius: 50;
+    -fx-padding: 15 50 15 50;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 24px;
+    -fx-text-fill: #F0F8FF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
+}
+#button4:pressed {
+	
+	-fx-background-color: #F0F8FF,
+        rgba(0,0,0,0),
+        linear-gradient(#4B0082, #4B0082);
+    -fx-background-insets: 0,9 9 8 9,3,10,11;
+    -fx-background-radius: 50;
+    -fx-padding: 14 49 14 49;
+    -fx-font-family: "Helvetica";
+    -fx-font-size: 24px;
+    -fx-text-fill: #F0F8FF;
+    -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.1) , 2, 0.0 , 0 , 1);
+}
 #tile-text1 {
 	
 	-fx-font-family: "Helvetica";
 	-fx-font-weight: bold;
-	-fx-font-size: 44px;
+	-fx-font-size: 56px;
+	-fx-fill: #F0F8FF;
 }
-
 #tile-text2 {
 	
 	-fx-font-family: "Helvetica";
 	-fx-font-weight: bold;
-	-fx-font-size: 36px;
+	-fx-font-size: 46px;
+	-fx-fill: #F0F8FF;
 }
-
 #tile-text3 {
 	
 	-fx-font-family: "Helvetica";
 	-fx-font-weight: bold;
-	-fx-font-size: 30px;
+	-fx-font-size: 38px;
+	-fx-fill: #F0F8FF;
 }
+#score-text {
+	
+	-fx-font: 40 helvetica;
+	-fx-font-weight: bold;
+	-fx-fill: #E6E6FA;
+}
+#game-pane {
+	
+	-fx-background-color: #6495ED;
+}
+#main-menu-pane {
+	
+	-fx-background-color: #6495ED;
+}
+#select-mode-pane {
+	
+	-fx-background-color: #6A5ACD;
+}
+#title-text {
+	
+	-fx-font-family: "Nunito";
+	-fx-font-size: 110px;
+	-fx-fill: #E6E6FA;
+}
+#mode-button {
+
+    -fx-text-fill: #F0F8FF; 
+}
+

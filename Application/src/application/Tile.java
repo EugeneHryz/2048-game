@@ -16,8 +16,8 @@ import javafx.scene.paint.Color;
 
 public class Tile extends StackPane {
 
-	private static int size = GameBoard.tilesSize - GameBoard.tilesSpacing;
-	private static int arcSize = GameBoard.tilesArcSize;
+	private static int size;
+	private static int arcSize;
 
 	private int number = 2;
 	private Rectangle tile;
@@ -32,11 +32,11 @@ public class Tile extends StackPane {
 	private Path path;
 	private PathTransition pathTr;
 	//private Translate translate;
-	private static int moveDuration = 1000;
+	public static int moveDuration = 500;
 	
 	private boolean combined = false;
 
-	Tile(int x, int y) {
+	Tile(int x, int y, int size, int arcSize) {
 
 		tile = new Rectangle(size, size);
 		tile.setArcHeight(arcSize);
@@ -44,14 +44,24 @@ public class Tile extends StackPane {
 		tile.setFill(color);
 
 		text = new Text(Integer.toString(number));
-		text.setFill(Color.ALICEBLUE);
-		text.setId("tile-text1");
+		if (size > (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
+			
+			text.setId("tile-text1");
+		} else if (size < (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
+			
+			text.setId("tile-text3");
+		} else {
+			
+			text.setId("tile-text2");
+		}
 		
 		this.getChildren().addAll(tile, text);
 		this.setLayoutX(x);
 		this.setLayoutY(y);
 		this.x = x;
 		this.y = y;
+		this.size = size;
+		this.arcSize = arcSize;
 
 		path = new Path();
 
@@ -61,10 +71,10 @@ public class Tile extends StackPane {
 		pathTr.setCycleCount(1);
 		pathTr.setAutoReverse(false);
 		
-		//translate = new Translate();
 		pathTr.setOnFinished(new EventHandler<ActionEvent> () {
 			
 			public void handle(ActionEvent e) {
+				
 				setLayout();
 			}
 		});
@@ -95,7 +105,16 @@ public class Tile extends StackPane {
 			break;
 		case 128:
 			color = Color.MEDIUMTURQUOISE;
-			text.setId("tile-text2");
+			if (size > (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
+				
+				text.setStyle("-fx-font-size: 46px");
+			} else if (size < (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
+				
+				text.setStyle("-fx-font-size: 30px");
+			} else {
+				
+				text.setStyle("-fx-font-size: 36px");
+			}
 			break;
 		case 256:
 			color = Color.LIGHTSEAGREEN;
@@ -105,7 +124,16 @@ public class Tile extends StackPane {
 			break;
 		case 1024:
 			color = Color.DARKCYAN;
-			text.setId("tile-text3");
+			if (size > (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
+				
+				text.setStyle("-fx-font-size: 36px");
+			} else if (size < (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
+				
+				text.setStyle("-fx-font-size: 24px");
+			} else {
+				
+				text.setStyle("-fx-font-size: 28px");
+			}
 			break;
 		case 2048:
 			color = Color.CYAN;
@@ -114,7 +142,6 @@ public class Tile extends StackPane {
 		}
 
 		tile.setFill(color);
-
 	}
 	public void setMoveToX(int x) {
 		
@@ -123,7 +150,7 @@ public class Tile extends StackPane {
 	
 	public void setMoveToY(int y) {
 		
-		moveToY = this.y - y + size / 2; 
+		moveToY = y - this.y + size / 2; 
 	}
 
 	public int getNumber() {
@@ -135,8 +162,6 @@ public class Tile extends StackPane {
 		this.setTranslateX(0);
 		this.setTranslateY(0);
 		this.relocate(x, y);
-		System.out.println("Translate:" + this.getTranslateX() + " " + this.getTranslateY() + 
-				" Layout:" + this.getLayoutX() + " " + this.getLayoutY());
 	}
 	public void setCombined(boolean value) {
 		
@@ -149,26 +174,19 @@ public class Tile extends StackPane {
 	
 	public void moveTo() {
 
-		/*
-		 * path.getElements().clear(); path.getElements().add(new MoveTo(size / 2, size
-		 * / 2)); path.getElements().add(new LineTo(moveToX, moveToY));
-		 * 
-		 * pathTr.setPath(path);
-		 */
-		
+		path.getElements().clear();
+		path.getElements().add(new MoveTo(size / 2, size / 2));
+		path.getElements().add(new LineTo(moveToX, moveToY));
+
+		pathTr.setPath(path);
+
 		x += moveToX - size / 2;
-		y += -moveToY + size / 2;
+		y += moveToY - size / 2;
 		
-		this.setLayoutX(x);
-		this.setLayoutY(y);
-		//pathTr.play();
-		/*
-		 * translate.setX(moveToX - size / 2); translate.setY(moveToY - size / 2);
-		 * 
-		 * this.getTransforms().add(translate);
-		 */
+		//this.setLayoutX(x);
+		//this.setLayoutY(y);
+		
+		pathTr.play();
 
 	}
-
-	
 }

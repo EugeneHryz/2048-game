@@ -34,24 +34,15 @@ import java.awt.Point;
 
 public class Game2048 extends Application {
 
-	public static final int xScene = 720;
-	public static final int yScene = 500;
-	public static final int bOffset = 50;
-
-	public static final int buttonX = 500;
-	public static final int button1Y = 3 * bOffset;
-	public static final int button2Y = 4 * bOffset + 40;
-	public static final int scoreX = 535;
-	public static final int scoreY = bOffset;
-
-	public static final int fieldSize = 5;
-
-	public static final int tilesSize = 80; 		// variables for 5x5 mode
-	public static final int tilesArcSize = 30;		// for 4x4 tilesSize 125, tilesSpacing 15
-	public static final int tilesSpacing = 5;
-
-	private Pane mainPane = new Pane();
-	private GameBoard board;
+	private static final int SCENE_SIZEX = 720;
+	private static final int SCENE_SIZEY = 500;
+	
+	private Scene scene;
+	private MainMenu mainMenu;
+	
+	private Game game;
+	
+	private static Stage window;
 
 	public static void main(String[] args) {
 
@@ -60,77 +51,29 @@ public class Game2048 extends Application {
 
 	public void start(Stage primaryStage) {
 
-		primaryStage.setTitle("2 0 4 8");
+		window = primaryStage;
+		window.setTitle("2 0 4 8");
 
-		Button newGameButton = new Button("New game");
-
-		newGameButton.setId("button1");
-
-		newGameButton.setLayoutX(buttonX);
-		newGameButton.setLayoutY(button1Y);
-
-		Button endGameButton = new Button("End");
-		endGameButton.setId("button2"); 		// was slateblue color
-
-		endGameButton.setLayoutX(buttonX);
-		endGameButton.setLayoutY(button2Y);
-
-		Text score = new Text("Score");
-		score.setStyle("-fx-font: 40 helvetica");
-
-		score.setLayoutX(scoreX);
-		score.setLayoutY(scoreY);
+		//game = new Game(5, 80, 5, 30);
+		//game.setFocusTraversable(true);
 		
-		newGameButton.setOnAction(new EventHandler<ActionEvent>() {
-
-			public void handle(ActionEvent event) {
-			}
-		});
-		endGameButton.setOnAction(new EventHandler<ActionEvent>() {
-
-			public void handle(ActionEvent event) {}
-		});
+		mainMenu = new MainMenu();
 		
-		board = new GameBoard(bOffset, bOffset, fieldSize, tilesSize, tilesSpacing, tilesArcSize);
+		scene = new Scene(mainMenu, SCENE_SIZEX, SCENE_SIZEY);
 		
-		board.createTileRandom();
-		board.createTileRandom();
-		board.setFocusTraversable(true);
-		
-		mainPane.getChildren().addAll(newGameButton, endGameButton, score, board);
-		mainPane.setStyle("-fx-background-color: #6495ED");
-
-		Scene scene = new Scene(mainPane, xScene, yScene);
-		
-		board.setOnKeyPressed(new EventHandler<KeyEvent> () {
-
-			public void handle(KeyEvent e) {
-				
-				switch (e.getCode()) {
-				
-				case A:
-					board.moveAllTiles(Direction.LEFT);
-					break;
-				case D:
-					board.moveAllTiles(Direction.RIGHT);
-					break;
-				case W:
-					board.moveAllTiles(Direction.UP);
-					break;
-				case S:
-					board.moveAllTiles(Direction.DOWN);
-					break;
-				}
-			}
-			
-			
-		});
-		
-		primaryStage.setScene(scene);
+		window.setScene(scene);
 
 		scene.getStylesheets().add("MyStyles.css");
-		primaryStage.show();
+		window.setResizable(false);
 		
-		board.requestFocus();
+		window.show();
+		
+		mainMenu.requestFocus();
+		//game.requestFocus();
+	}
+	
+	public static void closeGame() {
+		
+		window.close();
 	}
 }

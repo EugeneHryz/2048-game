@@ -1,61 +1,76 @@
 package application;
 
+import java.util.*;
 import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Random;
 
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
+import javafx.animation.PauseTransition;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
-
-import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 
 public class GameBoard extends Pane {
 
-	private static final int playAreaSize = 400;
-	private static final int fieldArcSize = 50;
+	private static final int PLAY_AREA_SIZE = 400;
+	private static final int FIELD_ARC_SIZE = 50;
 	
-	private static int fieldSize;
-	public static int tilesSpacing;
-	public static int tilesSize;
-	public static int tilesArcSize;
+	private static final int LAYOUTX = 50;
+	private static final int LAYOUTY = 50;
+	
+	private int fieldSize;
+	private int tilesSpacing;
+	private int tilesSize;
+	private int tilesArcSize;
 
 	private Rectangle field;
 	
 	private Tile[][] board;
 	private Point grid[][];
 	
-	private Direction direction;
+	private PauseTransition pause;
+	private List<Tile> tilesToRemove;
+	private List<Tile> tilesToCombine;
+	private Iterator iterRemoveList;
+	private Iterator<Tile> iterCombineList;
+	
+	private boolean canCreate = false;
 
 	GameBoard(int fieldSize, int tilesSize, int tilesSpacing, int tilesArcSize) {
 
-		GameBoard.fieldSize = fieldSize;
-		GameBoard.tilesSize = tilesSize;
-		GameBoard.tilesSpacing = tilesSpacing;
-		GameBoard.tilesArcSize = tilesArcSize;
-	}
-
-	GameBoard(int x, int y, int fieldSize, int tilesSize, int tilesSpacing, int tilesArcSize) {
-
-		this(fieldSize, tilesSize, tilesSpacing, tilesArcSize);
+		this.fieldSize = fieldSize;
+		this.tilesSize = tilesSize;
+		this.tilesSpacing = tilesSpacing;
+		this.tilesArcSize = tilesArcSize;
 		
 		board = new Tile[fieldSize][fieldSize];
 		grid = new Point[fieldSize][fieldSize];
 
-		field = new Rectangle(playAreaSize + tilesSpacing, playAreaSize + tilesSpacing);
-		field.setArcHeight(fieldArcSize);
-		field.setArcWidth(fieldArcSize);
+		field = new Rectangle(PLAY_AREA_SIZE + tilesSpacing, PLAY_AREA_SIZE + tilesSpacing);
+		field.setArcHeight(FIELD_ARC_SIZE);
+		field.setArcWidth(FIELD_ARC_SIZE);
 		field.setFill(Color.ALICEBLUE);
 		field.setLayoutX(-tilesSpacing);
 		field.setLayoutY(-tilesSpacing);
 		
+		pause = new PauseTransition(Duration.millis(Tile.moveDuration));
+		pause.setOnFinished(new EventHandler<ActionEvent> () {
+			public void handle(ActionEvent e) {
+				createTileRandom();
+				combineTiles();
+				removeTiles();
+				Keyboard.setAnimationPlays(false);
+			}
+		});
+		
+		tilesToRemove = new ArrayList<>();
+		tilesToCombine = new ArrayList<>();
+		
 		this.getChildren().add(field);
-		this.setLayoutX(x);
-		this.setLayoutY(y);
+		this.setLayoutX(LAYOUTX);
+		this.setLayoutY(LAYOUTY);
 		
 		for (int i = 0; i < fieldSize; i++) {
 
@@ -65,9 +80,10 @@ public class GameBoard extends Pane {
 				grid[i][j] = point;
 			}
 		}
+
 	}
-	
-	public boolean moveTile(int row, int column, int hDir, int vDir, Direction dir) {
+
+	private boolean moveTile(int row, int column, int hDir, int vDir, Direction dir) {
 		
 		boolean moved = false;
 		
@@ -78,6 +94,7 @@ public class GameBoard extends Pane {
 		int currentRow = row;
 		int currentColumn = column;
 		boolean canMove = true;
+		boolean delete = false;
 		
 		while (checkBounds(currentRow, currentColumn, dir) && canMove) {
 			
@@ -86,10 +103,14 @@ public class GameBoard extends Pane {
 				if (board[currentRow + vDir][currentColumn + hDir].getNumber() == board[currentRow][currentColumn].getNumber() 
 						&& !board[currentRow + vDir][currentColumn + hDir].getCombined()) {
 					
-					board[currentRow + vDir][currentColumn + hDir].getNextTile();
+					tilesToCombine.add(board[currentRow + vDir][currentColumn + hDir]);
+					//board[currentRow + vDir][currentColumn + hDir].getNextTile();
 					board[currentRow + vDir][currentColumn + hDir].setCombined(true);
-					this.getChildren().remove(board[currentRow][currentColumn]);
-					board[currentRow][currentColumn] = null;
+					//this.getChildren().remove(board[currentRow][currentColumn]);
+					//board[currentRow][currentColumn] = null;
+					currentRow += vDir;
+					currentColumn += hDir;
+					delete = true;
 					moved = true;
 				}
 				
@@ -110,6 +131,11 @@ public class GameBoard extends Pane {
 			current.setMoveToX(grid[currentRow][currentColumn].x);
 			current.setMoveToY(grid[currentRow][currentColumn].y);
 			current.moveTo();
+			if (delete) {
+				
+				tilesToRemove.add(board[currentRow - vDir][currentColumn - hDir]);
+				board[currentRow - vDir][currentColumn - hDir] = null;
+			}
 		}
 		return moved;
 	}
@@ -117,7 +143,6 @@ public class GameBoard extends Pane {
 	public void moveAllTiles(Direction dir) {
 		
 		int horizontalDirection = 0, verticalDirection = 0;
-		boolean canCreate = false;
 		
 		if (dir == Direction.LEFT) {
 
@@ -173,8 +198,9 @@ public class GameBoard extends Pane {
 			}
 		}
 		if (canCreate) {
-			
-			createTileRandom();
+
+			Keyboard.setAnimationPlays(true);
+			pause.play();
 		}
 		for (int row = 0; row < fieldSize; row++) {
 			
@@ -186,15 +212,36 @@ public class GameBoard extends Pane {
 				}
 			}
 		}
+		
+	}
+	
+	private void removeTiles() {
+		
+		iterRemoveList = tilesToRemove.iterator();
+		while (iterRemoveList.hasNext()) {
+			
+			this.getChildren().remove(iterRemoveList.next());
+		}
+		tilesToRemove.clear();
+	}
+	
+	private void combineTiles() {
+		
+		iterCombineList = tilesToCombine.iterator();
+		while (iterCombineList.hasNext()) {
+			
+			iterCombineList.next().getNextTile();
+		}
+		tilesToCombine.clear();
 	}
 	
 	public void testMethod1() {
 		
-		Tile testTile1 = new Tile(grid[2][4].x, grid[2][4].y);
+		Tile testTile1 = new Tile(grid[2][4].x, grid[2][4].y, tilesSize, tilesArcSize);
 		board[2][4] = testTile1;
 		this.getChildren().add(testTile1);
 		
-		Tile testTile2 = new Tile(grid[2][1].x, grid[2][1].y);
+		Tile testTile2 = new Tile(grid[2][1].x, grid[2][1].y, tilesSize, tilesArcSize);
 		board[2][1] = testTile2;
 		this.getChildren().add(testTile2);
 	}
@@ -235,14 +282,29 @@ public class GameBoard extends Pane {
 			
 			if (board[row][column] == null) {
 				
-				tile = new Tile(grid[row][column].x, grid[row][column].y);
+				tile = new Tile(grid[row][column].x, grid[row][column].y, tilesSize - tilesSpacing, tilesArcSize);
 				board[row][column] = tile;
 				notOccupied = true;
 			}
 		}
 		this.getChildren().add(tile);
-		System.out.println("Translate:" + this.getTranslateX() + " " + this.getTranslateY() + 
-				" Layout:" + this.getLayoutX() + " " + this.getLayoutY());
 	}
 	
+	public void newGame() {
+		
+		for (int i = 0; i < fieldSize; i++) {
+			
+			for (int j = 0; j < fieldSize; j++) {
+				
+				if (board[i][j] != null) {
+					
+					this.getChildren().remove(board[i][j]);
+					board[i][j] = null;
+				}
+			}
+		}
+		createTileRandom();
+		createTileRandom();
+	}
+
 }
