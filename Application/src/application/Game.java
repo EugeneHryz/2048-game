@@ -1,12 +1,5 @@
 package application;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.text.Text;
-
 public class Game {
 	
 	// constants for 4x4 mode
@@ -29,26 +22,23 @@ public class Game {
 	
 	private GameBoard board;
 	
-	Game(Mode mode) {
+	Game(Mode mode, int currentIndex) {
 
 		switch (mode) {
 
 		case MODE4X4:
 			
-			board = new GameBoard(FIELD_SIZE_4X4, TILES_SIZE_4X4, TILES_SPACING_4X4, TILES_ARCSIZE_4X4);
+			board = new GameBoard(FIELD_SIZE_4X4, TILES_SIZE_4X4, TILES_SPACING_4X4, TILES_ARCSIZE_4X4, currentIndex);
 			break;
 		case MODE5X5:
 
-			board = new GameBoard(FIELD_SIZE_5X5, TILES_SIZE_5X5, TILES_SPACING_5X5, TILES_ARCSIZE_5X5);
+			board = new GameBoard(FIELD_SIZE_5X5, TILES_SIZE_5X5, TILES_SPACING_5X5, TILES_ARCSIZE_5X5, currentIndex);
 			break;
 		case MODE6X6:
 
-			board = new GameBoard(FIELD_SIZE_6X6, TILES_SIZE_6X6, TILES_SPACING_6X6, TILES_ARCSIZE_6X6);
+			board = new GameBoard(FIELD_SIZE_6X6, TILES_SIZE_6X6, TILES_SPACING_6X6, TILES_ARCSIZE_6X6, currentIndex);
 			break;
 		}
-		
-		board.createTileRandom();
-		board.createTileRandom();
 	}
 
 	public GameBoard getGameBoard() {

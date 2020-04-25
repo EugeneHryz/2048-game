@@ -3,7 +3,6 @@ package application;
 import java.util.*;
 import java.awt.Point;
 import java.util.Random;
-
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -33,17 +32,25 @@ public class GameBoard extends Pane {
 	private PauseTransition pause;
 	private List<Tile> tilesToRemove;
 	private List<Tile> tilesToCombine;
-	private Iterator iterRemoveList;
+	
+	private Iterator<Tile> iterRemoveList;
 	private Iterator<Tile> iterCombineList;
 	
-	private boolean canCreate = false;
+	private ScoreManager scoreManager;
+	private int currentIndex;
 
-	GameBoard(int fieldSize, int tilesSize, int tilesSpacing, int tilesArcSize) {
+	GameBoard(int fieldSize, int tilesSize, int tilesSpacing, int tilesArcSize, int index) {
 
 		this.fieldSize = fieldSize;
 		this.tilesSize = tilesSize;
 		this.tilesSpacing = tilesSpacing;
 		this.tilesArcSize = tilesArcSize;
+		scoreManager = new ScoreManager(this.fieldSize, board);
+		if (index == -1) {
+			currentIndex = scoreManager.getNumberOfLines();
+		}
+		else
+			currentIndex = index;
 		
 		board = new Tile[fieldSize][fieldSize];
 		grid = new Point[fieldSize][fieldSize];
@@ -55,19 +62,21 @@ public class GameBoard extends Pane {
 		field.setLayoutX(-tilesSpacing);
 		field.setLayoutY(-tilesSpacing);
 		
-		pause = new PauseTransition(Duration.millis(Tile.moveDuration));
+		pause = new PauseTransition(Duration.millis(Tile.MOVE_DURATION));
 		pause.setOnFinished(new EventHandler<ActionEvent> () {
 			public void handle(ActionEvent e) {
 				createTileRandom();
 				combineTiles();
 				removeTiles();
 				Keyboard.setAnimationPlays(false);
+				scoreManager.setCopyBoard(board);
+				scoreManager.saveGame(currentIndex);
 			}
 		});
 		
 		tilesToRemove = new ArrayList<>();
 		tilesToCombine = new ArrayList<>();
-		
+	
 		this.getChildren().add(field);
 		this.setLayoutX(LAYOUTX);
 		this.setLayoutY(LAYOUTY);
@@ -80,7 +89,6 @@ public class GameBoard extends Pane {
 				grid[i][j] = point;
 			}
 		}
-
 	}
 
 	private boolean moveTile(int row, int column, int hDir, int vDir, Direction dir) {
@@ -104,10 +112,7 @@ public class GameBoard extends Pane {
 						&& !board[currentRow + vDir][currentColumn + hDir].getCombined()) {
 					
 					tilesToCombine.add(board[currentRow + vDir][currentColumn + hDir]);
-					//board[currentRow + vDir][currentColumn + hDir].getNextTile();
 					board[currentRow + vDir][currentColumn + hDir].setCombined(true);
-					//this.getChildren().remove(board[currentRow][currentColumn]);
-					//board[currentRow][currentColumn] = null;
 					currentRow += vDir;
 					currentColumn += hDir;
 					delete = true;
@@ -143,6 +148,7 @@ public class GameBoard extends Pane {
 	public void moveAllTiles(Direction dir) {
 		
 		int horizontalDirection = 0, verticalDirection = 0;
+		boolean canCreate = false;
 		
 		if (dir == Direction.LEFT) {
 
@@ -212,7 +218,6 @@ public class GameBoard extends Pane {
 				}
 			}
 		}
-		
 	}
 	
 	private void removeTiles() {
@@ -227,24 +232,22 @@ public class GameBoard extends Pane {
 	
 	private void combineTiles() {
 		
+		Tile tile;
 		iterCombineList = tilesToCombine.iterator();
 		while (iterCombineList.hasNext()) {
 			
-			iterCombineList.next().getNextTile();
+			tile = iterCombineList.next();
+			tile.getNextTile();
+			scoreManager.addScore(tile.getNumber());
+			tile.playAnimation();
+		}
+		if (!tilesToCombine.isEmpty()) {
+			
+			scoreManager.displayScore();
 		}
 		tilesToCombine.clear();
 	}
 	
-	public void testMethod1() {
-		
-		Tile testTile1 = new Tile(grid[2][4].x, grid[2][4].y, tilesSize, tilesArcSize);
-		board[2][4] = testTile1;
-		this.getChildren().add(testTile1);
-		
-		Tile testTile2 = new Tile(grid[2][1].x, grid[2][1].y, tilesSize, tilesArcSize);
-		board[2][1] = testTile2;
-		this.getChildren().add(testTile2);
-	}
 	private boolean checkBounds(int row, int column, Direction dir) {
 
 		if (dir == Direction.LEFT) {
@@ -288,23 +291,77 @@ public class GameBoard extends Pane {
 			}
 		}
 		this.getChildren().add(tile);
+		tile.playAnimation();
 	}
 	
-	public void newGame() {
+	public void loadGame() {
 		
+		if (scoreManager.getSavedGameInfo(currentIndex)) {
+			
+			int[][] savedBoard = scoreManager.getCopyBoard();
+			
+			for (int i = 0; i < fieldSize; i++) {
+				
+				for (int j = 0; j < fieldSize; j++) {
+					
+					if (savedBoard[i][j] != 0) {
+						
+						Tile tile = new Tile(grid[i][j].x, grid[i][j].y, tilesSize - tilesSpacing, tilesArcSize);
+						while (tile.getNumber() != savedBoard[i][j]) {
+							tile.getNextTile();
+						}
+						board[i][j] = tile;
+						this.getChildren().add(tile);
+					}
+				}
+			}
+			scoreManager.displayScore();
+		}
+	}
+	
+	public boolean checkLosing() {
+		
+		boolean lose = true;
 		for (int i = 0; i < fieldSize; i++) {
 			
 			for (int j = 0; j < fieldSize; j++) {
-				
-				if (board[i][j] != null) {
-					
-					this.getChildren().remove(board[i][j]);
-					board[i][j] = null;
+
+				if (board[i][j] == null) {
+					lose = false;
 				}
+				else {
+					if (j > 0) {
+						if (board[i][j - 1] == null || board[i][j].getNumber() == board[i][j - 1].getNumber())
+							lose = false;
+					}
+					if (i > 0) {
+						if (board[i - 1][j] == null || board[i][j].getNumber() == board[i - 1][j].getNumber())
+							lose = false;
+					}
+					if (j < fieldSize - 1) {
+						if (board[i][j + 1] == null || board[i][j].getNumber() == board[i][j + 1].getNumber())
+							lose = false;
+					}
+					if (i < fieldSize - 1) {
+						if (board[i + 1][j] == null || board[i][j].getNumber() == board[i + 1][j].getNumber())
+							lose = false;
+					}
+				}
+				if (!lose)
+					return lose;
 			}
 		}
-		createTileRandom();
-		createTileRandom();
+		return lose;
+	}
+	
+	public int getFieldSize() {
+		
+		return fieldSize;
+	}
+	
+	public ScoreManager getScoreManager() {
+		
+		return scoreManager;
 	}
 
 }

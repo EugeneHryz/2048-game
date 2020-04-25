@@ -5,10 +5,10 @@ import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import javafx.scene.transform.Translate;
 import javafx.util.Duration;
 import javafx.animation.PathTransition;
-import javafx.animation.PauseTransition;
+import javafx.animation.ScaleTransition;
+import javafx.animation.SequentialTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.StackPane;
@@ -31,12 +31,18 @@ public class Tile extends StackPane {
 	private int moveToY;
 	private Path path;
 	private PathTransition pathTr;
-	//private Translate translate;
-	public static int moveDuration = 500;
+	
+	public static final int MOVE_DURATION = 400;
+	private static final int SCALE_DURATION1 = 120;
+	private static final int SCALE_DURATION2 = 40;
+	
+	private ScaleTransition scaleTr1;
+	private ScaleTransition scaleTr2;
+	private SequentialTransition sequenceTr;
 	
 	private boolean combined = false;
 
-	Tile(int x, int y, int size, int arcSize) {
+	Tile (int x, int y, int size, int arcSize) {
 
 		tile = new Rectangle(size, size);
 		tile.setArcHeight(arcSize);
@@ -46,13 +52,13 @@ public class Tile extends StackPane {
 		text = new Text(Integer.toString(number));
 		if (size > (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
 			
-			text.setId("tile-text1");
+			text.setId("tile-large-text");
 		} else if (size < (Game.TILES_SIZE_5X5 - Game.TILES_SPACING_5X5)) {
 			
-			text.setId("tile-text3");
+			text.setId("tile-small-text");
 		} else {
 			
-			text.setId("tile-text2");
+			text.setId("tile-medium-text");
 		}
 		
 		this.getChildren().addAll(tile, text);
@@ -67,18 +73,33 @@ public class Tile extends StackPane {
 
 		pathTr = new PathTransition();
 		pathTr.setNode(this);
-		pathTr.setDuration(Duration.millis(moveDuration));
+		pathTr.setDuration(Duration.millis(MOVE_DURATION));
 		pathTr.setCycleCount(1);
 		pathTr.setAutoReverse(false);
 		
 		pathTr.setOnFinished(new EventHandler<ActionEvent> () {
-			
 			public void handle(ActionEvent e) {
-				
 				setLayout();
 			}
 		});
+
+		scaleTr1 = new ScaleTransition(Duration.millis(SCALE_DURATION1), tile);
+		scaleTr1.setFromX(0.95);
+		scaleTr1.setFromY(0.95);
+		scaleTr1.setToX(1.05);
+		scaleTr1.setToY(1.05);
+		
+		scaleTr2 = new ScaleTransition(Duration.millis(SCALE_DURATION2), tile);
+		scaleTr2.setFromX(1.05);
+		scaleTr2.setFromY(1.05);
+		scaleTr2.setToX(1);
+		scaleTr2.setToY(1);
+		
+		sequenceTr = new SequentialTransition();
+		sequenceTr.getChildren().addAll(scaleTr1, scaleTr2);
 	}
+	
+	
 
 	public void getNextTile() {
 
@@ -138,7 +159,6 @@ public class Tile extends StackPane {
 		case 2048:
 			color = Color.CYAN;
 			break;
-
 		}
 
 		tile.setFill(color);
@@ -182,11 +202,12 @@ public class Tile extends StackPane {
 
 		x += moveToX - size / 2;
 		y += moveToY - size / 2;
-		
-		//this.setLayoutX(x);
-		//this.setLayoutY(y);
-		
-		pathTr.play();
 
+		pathTr.play();
+	}
+	
+	public void playAnimation() {
+		
+		sequenceTr.play();
 	}
 }
